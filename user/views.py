@@ -42,13 +42,33 @@ def login():
         try:
             user = User.query.filter_by(username=username).one()
             if user.password == password:
-                session['usernme'] = username
+                session['username'] = username
                 return redirect('/user/info')
             else:
                 return '密码错误'
         except Exception:
             return '您还没有注册，请先注册'
 
-
     else:
         return render_template('login.html')
+
+@user_bp.route('/info')
+def info():
+    username = session.get('username')
+    if not username:
+        return '亲您还没有登录哦！请您先登录的呢。'
+    else:
+        user = User.query.filter_by(username=username).one()
+        return render_template('info.html',user=user)
+
+
+
+
+
+
+
+
+
+
+
+

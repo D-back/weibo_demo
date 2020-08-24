@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+<!--信息页面-->
+{% block content %}
+<h2>亲，您的信息如下:</h2>
+<hr>
+    <div style="margin: auto">
+        <b>用户名:{{ user.username }}</b><br/>
+        <b>性别:{{ user.gender }}</b><br/>
+        <b>城市:{{ user.city }}</b><br/>
+        <b>手机号:{{ user.phone }}</b>
+    </div>
+
+{% endblock  %}
