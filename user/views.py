@@ -52,6 +52,7 @@ def login():
     else:
         return render_template('login.html')
 
+#用户个人信息页面
 @user_bp.route('/info')
 def info():
     username = session.get('username')
@@ -61,7 +62,15 @@ def info():
         user = User.query.filter_by(username=username).one()
         return render_template('info.html',user=user)
 
-
+#退出功能
+@user_bp.route('logout')
+def logout():
+    username = session.get('username')
+    if not username:
+        return '您已经是未登录状态了'
+    else:
+        session.pop('username')
+        return redirect('/user/login')
 
 
 
