@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Blueprint
 from flask import redirect
 from flask import render_template
@@ -21,8 +23,9 @@ def create_art():
         if request.method == 'POST':
             title = request.form.get('title')
             content = request.form.get('content')
+            create_time = datetime.datetime.now()
             if title and content:
-                article = Arcitle(title=title,content=content)
+                article = Arcitle(title=title,content=content,create_time=create_time)
                 db.session.add(article)
                 db.session.commit()
                 session['title'] = title
@@ -33,3 +36,12 @@ def create_art():
         else:
             return render_template('publish_article.html')
 
+#微博显示接口
+@article_bp.route('/show')
+def show():
+    title = session['title']
+    if not title:
+        return redirect('/article/create')
+    else:
+        article = Arcitle.query.filter_by(title=title).one()
+        return render_template('show.html',article=article)

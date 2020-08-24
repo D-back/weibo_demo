@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+<!--动态显示页面-->
+{% block content %}
+<h2>标题:{{ article.title }}</h2>
+<hr>
+内容:{{ article.content }}
+
+{% endblock  %}

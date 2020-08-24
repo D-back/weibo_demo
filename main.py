@@ -5,6 +5,7 @@ from flask_migrate import Migrate,MigrateCommand
 
 from libs.orm import db
 from user.views import user_bp
+from article.views import article_bp
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:961224@localhost:3306/weibo'
@@ -16,6 +17,7 @@ migrate = Migrate(app,db)
 manager.add_command('db',MigrateCommand)
 
 app.register_blueprint(user_bp)
+app.register_blueprint(article_bp)
 
 @app.route('/')
 def home():
