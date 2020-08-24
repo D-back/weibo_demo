@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <style>
+        body {
+            width: 1000px;
+            margin: auto;
+        }
+        .nav {
+            height: 100px;
+            width: 1000px;
+            background-color: cadetblue;
+        }
+        .container {
+            height: 600px;
+            width: 1000px;
+            background-color: orange;
+        }
+        .content {
+            height: 600px;
+            width: 700px;
+            float: left;
+            background-color: pink;
+        }
+        .sidebar {
+            width: 300px;
+            height: 600px;
+            background-color:moccasin;
+            float: right;
+        }
+        .footbar {
+            width: 1000px;
+            height: 100px;
+            background-color: darkgray;
+        }
+        a {
+            text-decoration: none;
+        }
+
+
+    </style>
+</head>
+<body>
+    <!-- 导航栏   -->
+    <div class="nav">
+        {% include 'nav.html'  %}
+
+    </div>
+    <!-- 内容   -->
+    <div class="container">
+        <!-- 内容区       -->
+        <div class="content">
+            {% block content %}
+            There is no content
+            {% endblock %}
+        </div>
+        <!-- 边栏       -->
+        <div class="sidebar">
+            {% block sidebar %}
+            There is no content
+            {% endblock %}
+
+        </div>
+    </div>
+    <!-- 底栏   -->
+    <div class="footbar">
+    </div>
+
+</body>
+</html>
