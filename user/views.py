@@ -11,7 +11,7 @@ user_bp = Blueprint('user',__name__,url_prefix='/user')
 user_bp.template_folder = './templates'
 
 
-#注册页面
+#注册接口
 @user_bp.route('/register',methods=('POST','GET'))
 def register():
     if request.method == 'POST':
@@ -34,6 +34,8 @@ def register():
     else:
         return render_template('register.html')
 
+
+#登录接口
 @user_bp.route('/login',methods=('POST','GET'))
 def login():
     if request.method == 'POST':
@@ -52,7 +54,7 @@ def login():
     else:
         return render_template('login.html')
 
-#用户个人信息页面
+#用户个人信息接口
 @user_bp.route('/info')
 def info():
     username = session.get('username')
@@ -62,7 +64,7 @@ def info():
         user = User.query.filter_by(username=username).one()
         return render_template('info.html',user=user)
 
-#退出功能
+#退出接口
 @user_bp.route('logout')
 def logout():
     username = session.get('username')

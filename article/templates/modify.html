@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+<!--修改动态页面-->
+{% block content %}
+<h2>您的所有动态</h2>
+<hr>
+{% for art in articles %}
+
+<form action="/article/modify" method="post" enctype="multipart/form-data">
+    <div style="margin: auto">
+        <input type="text" name="id" value="{{ art.id }}" hidden>
+        标题:<input type="text" name="title" value="{{ art.title }}" ><br />
+        内容:<textarea name="content" >{{ art.content }}</textarea><br />
+        <input type="submit" value="修改">
+
+    </div>
+</form>
+{% endfor %}
+{% endblock  %}

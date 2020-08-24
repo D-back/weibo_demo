@@ -45,3 +45,25 @@ def show():
     else:
         article = Arcitle.query.filter_by(title=title).one()
         return render_template('show.html',article=article)
+
+
+#修改动态接口
+@article_bp.route('/modify',methods=('POST','GET'))
+def modify():
+    if request.method == 'POST':
+        art_id = int(request.form.get('id'))
+        title = request.form.get('title')
+        content = request.form.get('content')
+        article = Arcitle.query.filter_by(id=art_id).one()
+        article.title = title
+        article.content = content
+        db.session.commit()
+        session['title']=title
+        return redirect('/article/show')
+    else:
+        username = session.get('username')
+        if not username:
+            return '请先登录'
+        else:
+            articles = Arcitle.query.order_by(Arcitle.create_time).all()
+            return render_template('modify.html',articles=articles)
