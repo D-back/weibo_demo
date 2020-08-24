@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+<!--注册页面-->
+{% block content %}
+<h1>亲，欢迎注册哦！</h1>
+<form action="/user/register" method="post" enctype="multipart/form-data">
+    <div style="margin: auto">
+        账户:<input type="text" name="username" ><br />
+        密码:<input type="password" name="password" ><br />
+        性别:<input type="radio" name="gender"  value="男" checked>
+             <input type="radio" name="gender" value="女" ><br />
+        城市:<input type="text" name="city" ><br />
+        手机号:<input type="text" name="phone" ><br />
+
+    </div>
+</form>
+
+
+{% endblock  %}
