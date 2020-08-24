@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+<!--发表动态页面-->
+{% block content %}
+<h2>说说现在的心情吧！</h2>
+<hr>
+<form action="/article/create" method="post" enctype="multipart/form-data">
+    <div style="margin: auto">
+        标题:<input type="text" name="title" ><br />
+        内容:<textarea name="content" ></textarea><br />
+        <input type="submit" value="发表">
+
+    </div>
+</form>
+
+{% endblock  %}
