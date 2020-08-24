@@ -39,7 +39,7 @@ def create_art():
 #微博显示接口
 @article_bp.route('/show')
 def show():
-    title = session['title']
+    title = session.get('title')
     if not title:
         return redirect('/article/create')
     else:
@@ -65,5 +65,19 @@ def modify():
         if not username:
             return '请先登录'
         else:
-            articles = Arcitle.query.order_by(Arcitle.create_time).all()
+            articles = Arcitle.query.order_by(Arcitle.create_time.desc()).all()
             return render_template('modify.html',articles=articles)
+
+#删除动态接口
+@article_bp.route('/delete')
+def delete_art():
+    art_id = int(request.args.get('art_id'))
+    Arcitle.query.filter_by(id=art_id).delete()
+    db.session.commit()
+
+    title = session.get('title')
+    if  not title:
+        pass
+    else:
+        session.pop('title')
+    return redirect('/')

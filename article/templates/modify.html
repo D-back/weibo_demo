@@ -11,7 +11,9 @@
         <input type="text" name="id" value="{{ art.id }}" hidden>
         标题:<input type="text" name="title" value="{{ art.title }}" ><br />
         内容:<textarea name="content" >{{ art.content }}</textarea><br />
-        <input type="submit" value="修改">
+        <input type="submit" value="修改"><br/>
+        <a href="/article/delete?art_id={{ art.id }}">删除动态</a>
+
 
     </div>
 </form>
