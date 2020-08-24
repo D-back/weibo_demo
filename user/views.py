@@ -33,3 +33,22 @@ def register():
 
     else:
         return render_template('register.html')
+
+@user_bp.route('/login',methods=('POST','GET'))
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        try:
+            user = User.query.filter_by(username=username).one()
+            if user.password == password:
+                session['usernme'] = username
+                return redirect('/user/info')
+            else:
+                return '密码错误'
+        except Exception:
+            return '您还没有注册，请先注册'
+
+
+    else:
+        return render_template('login.html')

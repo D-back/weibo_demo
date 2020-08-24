@@ -19,7 +19,7 @@ app.register_blueprint(user_bp)
 
 @app.route('/')
 def home():
-    return redirect('/user/register')
+    return redirect('/user/login')
 
 
 if __name__ == '__main__':
