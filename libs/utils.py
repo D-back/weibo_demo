@@ -28,7 +28,30 @@ def check_password(password,safe_password):
     hash_value = sha256(password).hexdigest()
     return hash_value == safe_password[32:]
 
+def save_avatar(avatar_file):
+    '''保存头像文件'''
+    #读取文件的二进制数据
+    file_bin_data = avatar_file.stream.read()
 
+    #文件指针归零
+    avatar_file.stream.seek(0)
+
+    #计算文件的md5值
+    filename = md5(file_bin_data).hexdigest()
+
+    #获取项目文件夹的绝对路径
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    #文件绝对路径
+    filepath = os.path.join(base_dir, 'static', 'upload', filename)
+
+    #保存文件
+    avatar_file.save(filepath)
+
+    #文件的 url
+    avatar_url = f'/static/upload/{filename}'
+
+    return avatar_url
 
 
 

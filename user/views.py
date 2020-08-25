@@ -10,6 +10,7 @@ from libs.orm import db
 from libs.utils import login_required
 from libs.utils import make_password
 from libs.utils import check_password
+from libs.utils import save_avatar
 from user.models import User
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
@@ -33,8 +34,16 @@ def register():
         except Exception:
             if not password1 or password1 != password2:
                 return render_template('register.html',err='密码不一致')
+
             user = User(username=username, password=make_password(password1),
-                        gender=gender, city=city, phone=phone,create_time=now)
+                        gender=gender, city=city, phone=phone, create_time=now)
+
+            #保存头像
+            avatar_file = request.files.get('avatar', '')
+            if avatar_file:
+                user.avatar=save_avatar(avatar_file)
+
+
             db.session.add(user)
             db.session.commit()
             return redirect('/user/login')

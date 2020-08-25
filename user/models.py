@@ -12,3 +12,4 @@ class User(db.Model):
     city = db.Column(db.String(20), default='上海')
     phone = db.Column(db.String(20))
     create_time = db.Column(db.DateTime)
+    avatar = db.Column(db.String(256),default='/static/img/default.png')
