@@ -7,6 +7,7 @@ from flask import request
 from flask import session
 
 from libs.orm import db
+from libs.utils import login_required
 from article.models import Arcitle
 
 article_bp = Blueprint('article', __name__, url_prefix='/article')
@@ -15,26 +16,27 @@ article_bp.template_folder = './templates'
 
 #发表动态接口
 @article_bp.route('/create',methods=('POST','GET'))
+@login_required
 def create_art():
-    username = session.get('username')
-    if not username:
-        return '请先登录'
-    else:
-        if request.method == 'POST':
-            title = request.form.get('title')
-            content = request.form.get('content')
-            create_time = datetime.datetime.now()
-            if title and content:
-                article = Arcitle(title=title,content=content,create_time=create_time)
-                db.session.add(article)
-                db.session.commit()
-                session['title'] = title
-                return redirect('/article/show')
-            else:
-                return '标题和内容都不能为空'
-
+    # username = session.get('username')
+    # if not username:
+    #     return '请先登录'
+    # else:
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        create_time = datetime.datetime.now()
+        if title and content:
+            article = Arcitle(title=title,content=content,create_time=create_time)
+            db.session.add(article)
+            db.session.commit()
+            session['title'] = title
+            return redirect('/article/show')
         else:
-            return render_template('publish_article.html')
+            return render_template('publish.html',err='标题和内容都不能为空')
+
+    else:
+        return render_template('publish_article.html')
 
 #微博显示接口
 @article_bp.route('/show')
@@ -49,6 +51,7 @@ def show():
 
 #修改动态接口
 @article_bp.route('/modify',methods=('POST','GET'))
+# @login_required
 def modify():
     if request.method == 'POST':
         art_id = int(request.form.get('id'))
@@ -63,7 +66,7 @@ def modify():
     else:
         username = session.get('username')
         if not username:
-            return '请先登录'
+            return render_template('login.html',err='您还没有登录，请先登录')
         else:
             articles = Arcitle.query.order_by(Arcitle.create_time.desc()).all()
             return render_template('modify.html',articles=articles)
