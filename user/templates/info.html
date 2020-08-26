@@ -4,12 +4,16 @@
 {% block content %}
 <h2>亲，您的信息如下:</h2>
 <hr>
-<div">
-    <img src="{{ user.avatar }}" width="200px"><br/>
-    <b>用户名:{{ user.username }}</b><br/>
-    <b>性别:{{ user.gender }}</b><br/>
-    <b>城市:{{ user.city }}</b><br/>
-    <b>手机号:{{ user.phone }}</b>
+<div>
+    <div style="margin-bottom: 20px"><img src="{{ user.avatar }}" width="200px"></div>
+
+    <ul class="list-group">
+        <li class="list-group-item"><strong>用户名:</strong>&nbsp;&nbsp;{{ user.username }}</li>
+        <li class="list-group-item"><strong>性别:</strong>&nbsp;&nbsp;{{ user.gender }}</li>
+        <li class="list-group-item"><strong>城市:</strong>&nbsp;&nbsp;{{ user.city }}</li>
+        <li class="list-group-item"><strong>手机号:</strong>&nbsp;&nbsp;{{ user.phone }}</li>
+    </ul>
+
 </div>
 
 {% endblock  %}
