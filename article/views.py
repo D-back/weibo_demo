@@ -1,4 +1,5 @@
 import datetime
+from math import ceil
 import random
 
 from flask import Blueprint
@@ -36,17 +37,19 @@ def create_art():
     #     content = ''
 
     if request.method == 'POST':
-        title = request.form.get('title')
+        uid = session.get('uid')
         content = request.form.get('content')
         create_time = datetime.datetime.now()
-        if title and content:
-            article = Arcitle(title=title, content=content, create_time=create_time)
+        updated = datetime.datetime.now()
+
+        if  content:
+            article = Arcitle(uid=uid,content=content, create_time=create_time,updated=updated)
             db.session.add(article)
             db.session.commit()
-            session['title'] = title
+            session['art_id'] = article.id
             return redirect('/article/show')
         else:
-            return render_template('publish.html', err='标题和内容都不能为空')
+            return render_template('publish_article.html', err='内容不能为空')
 
     else:
         return render_template('publish_article.html')
@@ -55,62 +58,53 @@ def create_art():
 # 微博显示接口
 @article_bp.route('/show')
 def show():
-    title = session.get('title')
-    if not title:
-        return redirect('/article/create')
-    else:
-        article = Arcitle.query.filter_by(title=title).one()
-        return render_template('show.html', article=article)
+    art_id = session.get('art_id')
+    article = Arcitle.query.get(art_id)
+    return render_template('show.html', article=article)
 
 
 # 修改动态接口
 @article_bp.route('/modify', methods=('POST', 'GET'))
-# @login_required
+@login_required
 def modify():
     if request.method == 'POST':
-        art_id = int(request.form.get('id'))
-        title = request.form.get('title')
-        content = request.form.get('content')
+        art_id = int(request.form.get('art_id'))
+        content = request.form.get('content',)
         article = Arcitle.query.filter_by(id=art_id).one()
-        article.title = title
-        article.content = content
-        db.session.commit()
-        session['title'] = title
-        return redirect('/article/show')
-    else:
-        username = session.get('username')
-        if not username:
-            return render_template('login.html', err='您还没有登录，请先登录')
+
+        if content:
+            article.content = content
+            article.updated = datetime.datetime.now()
+            db.session.commit()
+            session['art_id'] = art_id
+            return redirect('/article/show')
         else:
-            articles = Arcitle.query.order_by(Arcitle.create_time.desc()).all()
-            return render_template('modify.html', articles=articles)
+            uid = int(session.get('uid'))
+            articles = Arcitle.query.filter_by(uid=uid).order_by(Arcitle.create_time.desc()).all()
+            return render_template('modify.html', articles=articles,err='内容不能为空')
+
+    else:
+        uid = int(session.get('uid'))
+        articles = Arcitle.query.filter_by(uid=uid).order_by(Arcitle.create_time.desc()).all()
+        return render_template('modify.html', articles=articles)
 
 
 # 显示所有动态
 @article_bp.route('/show_all')
 def show_all():
-    username = session.get('username')
-    if not username:
-        return render_template('login.html', err='您还没有登录，请先登录')
+    page = int(request.args.get('page', 1))
+    count_articles = Arcitle.query.count()
+    per_page = ceil(count_articles / 30)
+
+    if page <= 3:
+        start, end = 1, 7
+    elif page > per_page - 3:
+        start, end = per_page - 6, per_page
     else:
-        num = request.args.get('num')
-        count_articles = (Arcitle.query.order_by(Arcitle.create_time.desc())).count()
-        page_num = count_articles // 30
-        syts = count_articles % 30
-
-        if not num:
-            articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(30)
-            return render_template('show_all.html', articles=articles, num=2)
-        elif int(num) <= page_num:
-            articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(30).offset(30 * (int(num) - 1))
-            return render_template('show_all.html', articles=articles, num=int(num) + 1)
-        elif page_num < int(num) <= page_num + 1:
-            articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(syts).offset(30 * (int(num) - 1))
-            return render_template('show_all.html', articles=articles, num=int(num) + 1)
-        elif int(num) > page_num + 1:
-            articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(syts).offset(30 * (int(num) - 2))
-            return render_template('show_all.html', articles=articles, err='已经是最后一页')
-
+        start, end = page - 3, page + 3
+    page_num = range(start, end + 1)
+    articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(30).offset(30 * (page - 1))
+    return render_template('show_all.html', articles=articles, page=page, page_num=page_num)
 
 
 # 删除动态接口
@@ -120,9 +114,9 @@ def delete_art():
     Arcitle.query.filter_by(id=art_id).delete()
     db.session.commit()
 
-    title = session.get('title')
-    if not title:
+    art_id = session.get('art_id')
+    if not art_id:
         pass
     else:
-        session.pop('title')
+        session.pop('art_id')
     return redirect('/')

@@ -1,5 +1,6 @@
 import os
 from hashlib import md5,sha256
+from functools import wraps
 
 from flask import session
 from flask import render_template
@@ -57,9 +58,10 @@ def save_avatar(avatar_file):
 
 #判断是否已登录
 def login_required(view_func):
+    @wraps(view_func)
     def check_sess(*args,**kwargs):
-        username = session.get('username')
-        if not username:
+        uid = session.get('uid')
+        if not uid:
             return render_template('login.html',err='您还没有登录，请先登录')
         else:
             return view_func(*args,**kwargs)

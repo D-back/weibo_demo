@@ -55,15 +55,15 @@ def register():
 # 登录接口
 @user_bp.route('/login', methods=('POST', 'GET'))
 def login():
-    username = session.get('username')
-    if not username:
+    uid = session.get('uid')
+    if not uid:
         if request.method == 'POST':
             username = request.form.get('username')
             password = request.form.get('password')
             try:
                 user = User.query.filter_by(username=username).one()
                 if check_password(password,user.password):
-                    session['username'] = username
+                    session['uid'] = user.id
                     return redirect('/user/info')
                 else:
                     return render_template('login.html',err='密码错误')
@@ -80,21 +80,14 @@ def login():
 @user_bp.route('/info')
 @login_required
 def info():
-    username = session.get('username')
-    # if not username:
-    #     return '亲您还没有登录哦！请您先登录的呢。'
-    # else:
-    user = User.query.filter_by(username=username).one()
+    uid = session.get('uid')
+    user = User.query.filter_by(id=uid).one()
     return render_template('info.html', user=user)
 
 
 # 退出接口
 @user_bp.route('logout')
+@login_required
 def logout():
-    username = session.get('username')
-    if not username:
-        return render_template('login.html',err='您还没有登录，请先登录')
-
-    else:
-        session.pop('username')
-        return redirect('/user/login')
+    session.pop('uid')
+    return redirect('/user/login')

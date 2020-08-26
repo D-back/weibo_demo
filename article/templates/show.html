@@ -2,10 +2,10 @@
 
 <!--动态显示页面-->
 {% block content %}
-<h2>标题:{{ article.title }}</h2>
+<h2>{{ article.author.username }}:</h2>
 <hr>
 <br/>
-内容:{{ article.content }}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{{ article.content }}<br>
 <a href="/article/delete?art_id={{ article.id }}">删除动态</a>
 
 {% endblock  %}
