@@ -3,70 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <title>首页</title>
-    <style>
-        body {
-            width: 1000px;
-            margin: auto;
-        }
-        .nav {
-            height: 100px;
-            width: 1000px;
-            background-color: cadetblue;
-        }
-        .container {
-            height: 600px;
-            width: 1000px;
-            background-color: orange;
-        }
-        .content {
-            height: 600px;
-            width: 700px;
-            float: left;
-            background-color: pink;
-        }
-        .sidebar {
-            width: 300px;
-            height: 600px;
-            background-color:moccasin;
-            float: right;
-        }
-        .footbar {
-            width: 1000px;
-            height: 100px;
-            background-color: darkgray;
-        }
-        a {
-            text-decoration: none;
-        }
-
-
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
 </head>
 <body>
     <!-- 导航栏   -->
-    <div class="nav">
-        {% include 'nav.html'  %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">
+            <img src="/static/img/logo.png" width="30">迷你动态圈
+        </a>
 
-    </div>
+
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/user/info">用户信息</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/article/create">发表动态</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/article/modify">修改动态</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#">关注的人</a>
+          </li>
+
+          <li class="nav-item active">
+            <a class="nav-link" href="#" >粉丝列表</a>
+          </li>
+        </ul>
+        <div>
+            {% if 'uid' in session %}
+            <a class="btn btn-outline-success my-2 my-sm-0" href="/user/info">{{ session.username }}</a>
+            <a class="btn btn-outline-success my-2 my-sm-0" href="/user/logout">退出</a>
+            {% else %}
+            <a class="btn btn-outline-success my-2 my-sm-0" href="/user/register">注册</a>
+            <a class="btn btn-outline-success my-2 my-sm-0" href="/user/login">登录</a>
+            {% endif %}
+        </div>
+      </div>
+    </nav>
+
     <!-- 内容   -->
     <div class="container">
+        <div class="row">
         <!-- 内容区       -->
-        <div class="content">
-            {% block content %}
-            There is no content
-            {% endblock %}
-        </div>
-        <!-- 边栏       -->
-        <div class="sidebar">
-            {% block sidebar %}
-            There is no content
-            {% endblock %}
-
+            <div class="col-8">
+                {% block content %}{% endblock %}
+            </div>
+            <!-- 边栏       -->
+            <div class="col-4">
+                {% block sidebar %}{% endblock %}
+            </div>
         </div>
     </div>
     <!-- 底栏   -->
     <div class="footbar">
+        <div class="text-center text-secondary">
+            版权所有 @ Dbcak
+        </div>
     </div>
 
 </body>
+
+<script src="/static/js/jquery-3.5.1.slim.min.js"></script>
+<script src="/static/js/popper.min.js" ></script>
+<script src="/static/js/bootstrap.min.js" ></script>
+
 </html>

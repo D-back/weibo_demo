@@ -64,6 +64,7 @@ def login():
                 user = User.query.filter_by(username=username).one()
                 if check_password(password,user.password):
                     session['uid'] = user.id
+                    session['username'] = username
                     return redirect('/user/info')
                 else:
                     return render_template('login.html',err='密码错误')
