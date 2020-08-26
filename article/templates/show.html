@@ -2,10 +2,17 @@
 
 <!--动态显示页面-->
 {% block content %}
-<h2>{{ article.author.username }}:</h2>
-<hr>
-<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;{{ article.content }}<br>
-<a href="/article/delete?art_id={{ article.id }}">删除动态</a>
+
+<div>
+    <div style="margin-top: 50px" class="form-group row">
+        <input type="text" name="art_id" value="{{ article.id }}" hidden>
+        <label class="col-sm-2 col-form-label">{{ article.author.username }}:</label>
+        <div class="col-sm-8">
+          <textarea class="form-control" name="content" rows="5">{{ article.content }}</textarea>
+           <a class="btn btn-danger" href="/article/delete?art_id={{ article.id }}">删除动态</a>
+        </div>
+    </div>
+</div>
+
 
 {% endblock  %}

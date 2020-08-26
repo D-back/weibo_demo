@@ -58,7 +58,7 @@ def create_art():
 # 微博显示接口
 @article_bp.route('/show')
 def show():
-    art_id = session.get('art_id')
+    art_id = int(session.get('art_id'))
     article = Arcitle.query.get(art_id)
     return render_template('show.html', article=article)
 
@@ -104,7 +104,7 @@ def show_all():
         start, end = page - 3, page + 3
     page_num = range(start, end + 1)
     articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(30).offset(30 * (page - 1))
-    return render_template('show_all.html', articles=articles, page=page, page_num=page_num)
+    return render_template('show_all.html', articles=articles, page=page, page_num=page_num,max_page=per_page)
 
 
 # 删除动态接口

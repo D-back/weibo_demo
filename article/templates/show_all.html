@@ -6,18 +6,42 @@
 
 <hr>
 {% for art in articles %}
+<div class="alert alert-info" role="alert">
+    <strong>{{ art.author.username }}</strong><br/>
 
-内容:{{ art.content | replace('\n','<br>') | safe }}
+    &nbsp;&nbsp;&nbsp;&nbsp;{{ art.content | replace('\n','<br>') | safe }}<br/><br/>
+    {% if art.author.id == session.uid %}
+    <a class="text-secondary" href="/article/show?art_id={{ art.id }}">{{ art.updated }}</a>
+    {% else %}
+    <a class="text-secondary" >{{ art.updated }}</a>
+    {% endif %}
 
-<br />
+</div>
 
 {% endfor %}
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <!--  判断是否是第一页      -->
+        {% if page == 1 %}
+         <li class="page-item"><a class="page-link" > 上一页  </a></li>
+        {% else %}
+         <li class="page-item"><a class="page-link" href="/article/show_all?page={{ page - 1 }}"> 上一页  </a></li>
+        {% endif %}
 
-<a href="/article/show_all?page={{ page - 1 }}"> 上一页  </a>
-{% for num in page_num %}
-<a href="/article/show_all?page={{ num }}"> {{ num }}  </a>
-{% endfor %}
-<a href="/article/show_all?page={{ page + 1 }}"> 下一页  </a>
+        {% for num in page_num %}
+            {% if num == page %}
+                <li class="page-item"><a class="page-link text-secondary">{{ num }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="/article/show_all?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
 
-
+        <!--    判断是否是最后一页    -->
+        {% if page == max_page  %}
+        <li class="page-item"><a class="page-link" > 下一页  </a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="/article/show_all?page={{ page + 1 }}"> 下一页  </a></li>
+        {% endif %}
+    </ul>
+</nav>
 {% endblock  %}
