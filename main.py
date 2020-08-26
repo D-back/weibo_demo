@@ -23,7 +23,7 @@ app.register_blueprint(article_bp)
 
 @app.route('/')
 def home():
-    return redirect('/user/login')
+    return redirect('/article/show_all')
 
 
 if __name__ == '__main__':

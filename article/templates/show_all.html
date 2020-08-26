@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+<!--显示所有动态页面-->
+{% block content %}
+<h2>您的所有动态</h2>
+
+{% if err  %}
+<h1 style="color:red ">{{ err }}</h1>
+{% endif %}
+<hr>
+{% for art in articles %}
+
+<h3>标题:{{ art.title }}</h3>
+内容:{{ art.content }}
+
+<br />
+
+{% endfor %}
+{% if not err %}
+
+<a href="/article/show_all?num={{ num }}"> 下一页  </a>
+{% else %}
+<a href="#"> 下一页 </a>
+{% endif %}
+
+{% endblock  %}
