@@ -56,8 +56,11 @@ def create_art():
 
 
 # 微博显示接口
-@article_bp.route('/show')
+@article_bp.route('/show',methods=('POST','GET'))
 def show():
+    # if request.method == 'POST':
+    #     art_id = int(request.form.get('art_id'))
+    # else:
     art_id = int(request.args.get('art_id'))
     article = Arcitle.query.get(art_id)
     return render_template('show.html', article=article)
@@ -68,7 +71,7 @@ def show():
 @login_required
 def modify():
     if request.method == 'POST':
-        art_id = int(request.form.get('art_id'))
+        art_id = request.form.get('art_id')
         content = request.form.get('content',)
         article = Arcitle.query.filter_by(id=art_id).one()
 
@@ -77,7 +80,7 @@ def modify():
             article.updated = datetime.datetime.now()
             db.session.commit()
             session['art_id'] = art_id
-            return redirect('/article/show')
+            return redirect(f'/article/show?art_id={art_id}')
         else:
             uid = int(session.get('uid'))
             articles = Arcitle.query.filter_by(uid=uid).order_by(Arcitle.create_time.desc()).all()
@@ -97,7 +100,7 @@ def show_all():
     per_page = ceil(count_articles / 30)
 
     if page <= 3:
-        start, end = 1, 7
+        start, end = 1, min(7,per_page)
     elif page > per_page - 3:
         start, end = per_page - 6, per_page
     else:
