@@ -47,7 +47,7 @@ def create_art():
             db.session.add(article)
             db.session.commit()
             session['art_id'] = article.id
-            return redirect('/article/show')
+            return redirect(f'/article/show?art_id={article.id}')
         else:
             return render_template('publish_article.html', err='内容不能为空')
 
@@ -58,7 +58,7 @@ def create_art():
 # 微博显示接口
 @article_bp.route('/show')
 def show():
-    art_id = int(session.get('art_id'))
+    art_id = int(request.args.get('art_id'))
     article = Arcitle.query.get(art_id)
     return render_template('show.html', article=article)
 
