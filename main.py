@@ -4,8 +4,11 @@ from flask import redirect
 from flask_migrate import Migrate, MigrateCommand
 
 from libs.orm import db
+from user.models import User
+from article.models import Arcitle
 from user.views import user_bp
 from article.views import article_bp
+
 
 
 app = Flask(__name__)
@@ -25,6 +28,13 @@ app.register_blueprint(article_bp)
 def home():
     return redirect('/article/show_all')
 
+
+@manager.command
+def create_test_weibo():
+    '''创建微博测试数据'''
+    users = User.fake_users(50)
+    uid_list = [u.id for u in users ]
+    Arcitle.fake_weibo(uid_list,500)
 
 if __name__ == '__main__':
     manager.run()

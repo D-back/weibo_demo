@@ -1,16 +1,17 @@
 import datetime
 from math import ceil
-import random
 
 from flask import Blueprint
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import session
+from flask import abort
 
 from libs.orm import db
 from libs.utils import login_required
 from article.models import Arcitle
+from article.models import Comment
 
 article_bp = Blueprint('article', __name__, url_prefix='/article')
 article_bp.template_folder = './templates'
@@ -20,30 +21,14 @@ article_bp.template_folder = './templates'
 @article_bp.route('/create', methods=('POST', 'GET'))
 @login_required
 def create_art():
-    # 产生随机动态
-    # title = ''
-    # content = ''
-    # name = [chr(x) for x in range(10000,18000)]
-    # for i in range(1,80):
-    #     for x in range(1,16):
-    #         title += random.choice(name)
-    #     for z in range(1,30):
-    #         content += random.choice(name)
-    #     create_time = datetime.datetime.now()
-    #     article = Arcitle(title=title, content=content, create_time=create_time)
-    #     db.session.add(article)
-    #     db.session.commit()
-    #     title = ''
-    #     content = ''
-
     if request.method == 'POST':
         uid = session.get('uid')
         content = request.form.get('content')
         create_time = datetime.datetime.now()
         updated = datetime.datetime.now()
 
-        if  content:
-            article = Arcitle(uid=uid,content=content, create_time=create_time,updated=updated)
+        if content:
+            article = Arcitle(uid=uid, content=content, create_time=create_time, updated=updated)
             db.session.add(article)
             db.session.commit()
             session['art_id'] = article.id
@@ -56,14 +41,19 @@ def create_art():
 
 
 # 微博显示接口
-@article_bp.route('/show',methods=('POST','GET'))
+@article_bp.route('/show')
 def show():
-    # if request.method == 'POST':
-    #     art_id = int(request.form.get('art_id'))
-    # else:
     art_id = int(request.args.get('art_id'))
     article = Arcitle.query.get(art_id)
-    return render_template('show.html', article=article)
+
+    #判断评论内容是否为空
+    err = request.args.get('err')
+    if err:
+        return render_template('show.html', article=article,err=err)
+    else:
+        #获取当前微博所有的评论
+        comments = Comment.query.filter_by(wid=art_id,is_delete=0).order_by(Comment.create_time.desc())
+        return render_template('show.html', article=article,comments=comments)
 
 
 # 修改动态接口
@@ -72,7 +62,7 @@ def show():
 def modify():
     if request.method == 'POST':
         art_id = request.form.get('art_id')
-        content = request.form.get('content',)
+        content = request.form.get('content', )
         article = Arcitle.query.filter_by(id=art_id).one()
 
         if content:
@@ -84,7 +74,7 @@ def modify():
         else:
             uid = int(session.get('uid'))
             articles = Arcitle.query.filter_by(uid=uid).order_by(Arcitle.create_time.desc()).all()
-            return render_template('modify.html', articles=articles,err='内容不能为空')
+            return render_template('modify.html', articles=articles, err='内容不能为空')
 
     else:
         uid = int(session.get('uid'))
@@ -100,14 +90,14 @@ def show_all():
     per_page = ceil(count_articles / 30)
 
     if page <= 3:
-        start, end = 1, min(7,per_page)
+        start, end = 1, min(7, per_page)
     elif page > per_page - 3:
         start, end = per_page - 6, per_page
     else:
         start, end = page - 3, page + 3
     page_num = range(start, end + 1)
     articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(30).offset(30 * (page - 1))
-    return render_template('show_all.html', articles=articles, page=page, page_num=page_num,max_page=per_page)
+    return render_template('show_all.html', articles=articles, page=page, page_num=page_num, max_page=per_page)
 
 
 # 删除动态接口
@@ -122,4 +112,42 @@ def delete_art():
         pass
     else:
         session.pop('art_id')
+    return redirect('/')
+
+
+#评论接口&回复接口
+@article_bp.route('/comment_art',methods=('POST',))
+def comment_art():
+    if request.method == 'POST':
+        uid = session.get('uid')
+        cid = int(request.form.get('cid','0'))
+        wid = request.form.get('art_id')
+        content = request.form.get('content')
+        now = datetime.datetime.now()
+
+        if content :
+            comment = Comment(wid=wid,uid=uid,content=content,create_time=now,cid=cid)
+            db.session.add(comment)
+            db.session.commit()
+            return redirect(f'/article/show?art_id={wid}')
+        else:
+            return redirect(f'/article/show?art_id={wid}&err=评论内容不能为空')
+    else:
+        abort(403)
+
+#删除评论接口
+@article_bp.route('/delete_cmt')
+def delete_cmt():
+    cid = int(request.args.get('cid'))
+    cmt = Comment.query.get(cid)
+
+
+    #检查是否是在删除别人的评论
+    if cmt.uid != session['uid']:
+        abort(403)
+
+    #修改数据
+    cmt.is_delete = 1
+    db.session.commit()
+
     return redirect('/')

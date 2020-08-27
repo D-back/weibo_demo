@@ -12,6 +12,7 @@ from libs.utils import make_password
 from libs.utils import check_password
 from libs.utils import save_avatar
 from user.models import User
+from article.models import Arcitle
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 user_bp.template_folder = './templates'

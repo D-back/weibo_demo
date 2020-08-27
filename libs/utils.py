@@ -1,4 +1,6 @@
 import os
+import random
+
 from hashlib import md5,sha256
 from functools import wraps
 
@@ -66,3 +68,9 @@ def login_required(view_func):
         else:
             return view_func(*args,**kwargs)
     return check_sess
+
+
+def random_zh_str(length):
+    '''随机产生一个中文字符串'''
+    words = [chr(random.randint(20000,23000)) for i in range(length)]
+    return ''.join(words)

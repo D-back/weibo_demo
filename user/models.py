@@ -1,5 +1,7 @@
-from libs.orm import db
+import random
 
+from libs.orm import db
+from libs.utils import random_zh_str
 
 class User(db.Model):
     """创建User表格"""
@@ -13,3 +15,22 @@ class User(db.Model):
     phone = db.Column(db.String(20))
     create_time = db.Column(db.DateTime)
     avatar = db.Column(db.String(256),default='/static/img/default.png')
+
+
+    #创建随机用户
+    @classmethod
+    def fake_users(cls,num):
+        users = []
+        for i in range(num):
+            username = random_zh_str(3)
+            password = '123456'
+            gender = random.choice(['男','女'])
+            phone = '123456789'
+            create_time = '2000-01-21'
+            user = cls(username=username,password=password,gender=gender,
+                       phone=phone,create_time=create_time)
+            users.append(user)
+
+        db.session.add_all(users)
+        db.session.commit()
+        return users
