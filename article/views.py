@@ -13,6 +13,7 @@ from libs.utils import login_required
 from article.models import Arcitle
 from article.models import Comment
 from article.models import Thumb
+from user.models import Follow
 
 article_bp = Blueprint('article', __name__, url_prefix='/article')
 article_bp.template_folder = './templates'
@@ -47,24 +48,24 @@ def show():
     art_id = int(request.args.get('art_id'))
     article = Arcitle.query.get(art_id)
 
-    #判断自己是否点过赞
+    # 判断自己是否点过赞
     uid = session.get('uid')
     if uid:
-        if Thumb.query.filter_by(wid=art_id,uid=uid).count():
+        if Thumb.query.filter_by(wid=art_id, uid=uid).count():
             is_thumb = True
         else:
             is_thumb = False
     else:
         is_thumb = False
 
-    #判断评论内容是否为空
+    # 判断评论内容是否为空
     err = request.args.get('err')
     if err:
-        return render_template('show.html', article=article,err=err)
+        return render_template('show.html', article=article, err=err)
     else:
-        #获取当前微博所有的评论
-        comments = Comment.query.filter_by(wid=art_id,is_delete=0).order_by(Comment.create_time.desc())
-        return render_template('show.html', article=article,comments=comments,is_thumb=is_thumb)
+        # 获取当前微博所有的评论
+        comments = Comment.query.filter_by(wid=art_id, is_delete=0).order_by(Comment.create_time.desc())
+        return render_template('show.html', article=article, comments=comments, is_thumb=is_thumb)
 
 
 # 修改动态接口
@@ -127,18 +128,18 @@ def delete_art():
     return redirect('/')
 
 
-#评论接口&回复接口
-@article_bp.route('/comment_art',methods=('POST',))
+# 评论接口&回复接口
+@article_bp.route('/comment_art', methods=('POST',))
 def comment_art():
     if request.method == 'POST':
         uid = session.get('uid')
-        cid = int(request.form.get('cid','0'))
+        cid = int(request.form.get('cid', '0'))
         wid = request.form.get('art_id')
         content = request.form.get('content')
         now = datetime.datetime.now()
 
-        if content :
-            comment = Comment(wid=wid,uid=uid,content=content,create_time=now,cid=cid)
+        if content:
+            comment = Comment(wid=wid, uid=uid, content=content, create_time=now, cid=cid)
             db.session.add(comment)
             db.session.commit()
             return redirect(f'/article/show?art_id={wid}')
@@ -147,47 +148,57 @@ def comment_art():
     else:
         abort(403)
 
-#删除评论接口
+
+# 删除评论接口
 @article_bp.route('/delete_cmt')
 def delete_cmt():
     cid = int(request.args.get('cid'))
     cmt = Comment.query.get(cid)
 
-
-    #检查是否是在删除别人的评论
+    # 检查是否是在删除别人的评论
     if cmt.uid != session['uid']:
         abort(403)
 
-    #修改数据
+    # 修改数据
     cmt.is_delete = 1
     db.session.commit()
 
     return redirect('/')
 
 
-#点赞接口
+# 点赞接口
 @article_bp.route('/thumb')
 @login_required
 def thumb():
     uid = session.get('uid')
     wid = int(request.args.get('wid'))
-    print(uid)
-    print(wid)
 
-
-    #判断是否是再次点赞
+    # 判断是否是再次点赞
     try:
-        thumb = Thumb.query.filter_by(uid=uid,wid=wid).one()
-        #取消点赞
+        thumb = Thumb.query.filter_by(uid=uid, wid=wid).one()
+        # 取消点赞
         if thumb:
             Thumb.query.filter_by(uid=uid, wid=wid).delete()
-            Arcitle.query.filter_by(id=wid).update({'n_thumb':Arcitle.n_thumb - 1})
+            Arcitle.query.filter_by(id=wid).update({'n_thumb': Arcitle.n_thumb - 1})
             db.session.commit()
     except Exception:
-        #提交点赞
-        thumb = Thumb(uid=uid,wid=wid)
+        # 提交点赞
+        thumb = Thumb(uid=uid, wid=wid)
         db.session.add(thumb)
         Arcitle.query.filter_by(id=wid).update({'n_thumb': Arcitle.n_thumb + 1})
         db.session.commit()
 
     return redirect(f'/article/show?art_id={wid}')
+
+
+#查看所有关注的人的微博
+@article_bp.route('/fw_article')
+@login_required
+def fw_art():
+    uid = session.get('uid')
+    fw = Follow.query.filter_by(uid=uid).values('fid')
+    fid_list = [fid for (fid,) in fw]
+    articles = Arcitle.query.filter(Arcitle.uid.in_(fid_list)).order_by(Arcitle.updated.desc()).limit(100)
+    return render_template('fw_article.html',articles=articles)
+
+

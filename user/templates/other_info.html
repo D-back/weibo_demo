@@ -2,7 +2,15 @@
 
 <!--信息页面-->
 {% block content %}
-<h2>亲，您的信息如下:</h2>
+<div style="margin-top: 20px">
+    <strong class="text-primary">{{ user.username }}</strong>&emsp;信息:
+    {% if is_follow %}
+    <a style="float: right" class="text-primary" href="/user/follow?fid={{ user.id }}">取消关注</a>
+    {% else %}
+    <a style="float: right" class="text-primary" href="/user/follow?fid={{ user.id }}">关注</a>
+    {% endif %}
+
+</div>
 <hr>
 <div>
     <div style="margin-bottom: 20px"><img src="{{ user.avatar }}" width="200px"></div>

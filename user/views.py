@@ -12,6 +12,7 @@ from libs.utils import make_password
 from libs.utils import check_password
 from libs.utils import save_avatar
 from user.models import User
+from user.models import Follow
 from article.models import Arcitle
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
@@ -86,10 +87,59 @@ def info():
     user = User.query.filter_by(id=uid).one()
     return render_template('info.html', user=user)
 
+#查看其他人个人信息接口
+@user_bp.route('/other_info')
+@login_required
+def other_info():
+    uid = int(request.args.get('uid'))
+    user = User.query.filter_by(id=uid).one()
+
+    #判断是否是查看自己的个人信息
+    if uid == session.get('uid'):
+        return render_template('info.html', user=user)
+
+    #判断是否关注这个用户
+    if Follow.query.filter_by(uid=session['uid'],fid=uid).count():
+        is_follow = True
+    else:
+        is_follow = False
+
+    return render_template('other_info.html', user=user,is_follow=is_follow)
+
 
 # 退出接口
-@user_bp.route('logout')
+@user_bp.route('/logout')
 @login_required
 def logout():
     session.pop('uid')
     return redirect('/user/login')
+
+
+#关注接口
+@user_bp.route('/follow')
+@login_required
+def follow_other_user():
+    uid = session.get('uid')   #自己的ID
+    fid = int(request.args.get('fid'))  #关注的人的id
+    print(uid)
+    print(fid)
+
+    try:
+        #取消关注
+        follow = Follow.query.filter_by(uid=uid,fid=fid).one()
+        if follow:
+            Follow.query.filter_by(uid=uid, fid=fid).delete()
+            User.query.filter_by(id=uid).update({'follows':User.follows - 1 })
+            User.query.filter_by(id=fid).update({'fans':User.fans - 1 })
+            db.session.commit()
+    except Exception:
+        #关注
+        fw = Follow(uid=uid, fid=fid)
+        User.query.filter_by(id=uid).update({'follows': User.follows + 1})
+        User.query.filter_by(id=fid).update({'fans': User.fans + 1})
+        db.session.add(fw)
+        db.session.commit()
+
+    return redirect(f'/user/other_info?uid={fid}')
+
+

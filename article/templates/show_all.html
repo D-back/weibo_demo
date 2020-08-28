@@ -7,9 +7,7 @@
 <hr>
 {% for art in articles %}
 <div class="alert alert-info" role="alert">
-    <strong>{{ art.author.username }}:</strong>
-    <a style="float: right" class="text-secondary" href="">关注</a>
-
+    <strong><a href="/user/other_info?uid={{ art.author.id }}">{{ art.author.username }}</a>:</strong>
     <hr>
     &nbsp;&nbsp;&nbsp;&nbsp;{{ art.content | replace('\n','<br>') | safe }}
     <hr>

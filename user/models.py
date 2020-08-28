@@ -15,7 +15,8 @@ class User(db.Model):
     phone = db.Column(db.String(20))
     create_time = db.Column(db.DateTime)
     avatar = db.Column(db.String(256),default='/static/img/default.png')
-
+    follows = db.Column(db.Integer,nullable=False,default=0)
+    fans = db.Column(db.Integer,nullable=False,default=0)
 
     #创建随机用户
     @classmethod
@@ -34,3 +35,12 @@ class User(db.Model):
         db.session.add_all(users)
         db.session.commit()
         return users
+
+
+class Follow(db.Model):
+    __tablename__ = 'follow'
+
+    #自己跟随的用用户的id
+    fid = db.Column(db.Integer,nullable=False,primary_key=True)
+    #自己的id
+    uid = db.Column(db.Integer,nullable=False,primary_key=True)
