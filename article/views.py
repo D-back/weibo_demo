@@ -12,6 +12,7 @@ from libs.orm import db
 from libs.utils import login_required
 from article.models import Arcitle
 from article.models import Comment
+from article.models import Thumb
 
 article_bp = Blueprint('article', __name__, url_prefix='/article')
 article_bp.template_folder = './templates'
@@ -46,6 +47,16 @@ def show():
     art_id = int(request.args.get('art_id'))
     article = Arcitle.query.get(art_id)
 
+    #判断自己是否点过赞
+    uid = session.get('uid')
+    if uid:
+        if Thumb.query.filter_by(wid=art_id,uid=uid).count():
+            is_thumb = True
+        else:
+            is_thumb = False
+    else:
+        is_thumb = False
+
     #判断评论内容是否为空
     err = request.args.get('err')
     if err:
@@ -53,7 +64,7 @@ def show():
     else:
         #获取当前微博所有的评论
         comments = Comment.query.filter_by(wid=art_id,is_delete=0).order_by(Comment.create_time.desc())
-        return render_template('show.html', article=article,comments=comments)
+        return render_template('show.html', article=article,comments=comments,is_thumb=is_thumb)
 
 
 # 修改动态接口
@@ -97,7 +108,8 @@ def show_all():
         start, end = page - 3, page + 3
     page_num = range(start, end + 1)
     articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(30).offset(30 * (page - 1))
-    return render_template('show_all.html', articles=articles, page=page, page_num=page_num, max_page=per_page)
+    return render_template('show_all.html', articles=articles, page=page,
+                           page_num=page_num, max_page=per_page)
 
 
 # 删除动态接口
@@ -151,3 +163,31 @@ def delete_cmt():
     db.session.commit()
 
     return redirect('/')
+
+
+#点赞接口
+@article_bp.route('/thumb')
+@login_required
+def thumb():
+    uid = session.get('uid')
+    wid = int(request.args.get('wid'))
+    print(uid)
+    print(wid)
+
+
+    #判断是否是再次点赞
+    try:
+        thumb = Thumb.query.filter_by(uid=uid,wid=wid).one()
+        #取消点赞
+        if thumb:
+            Thumb.query.filter_by(uid=uid, wid=wid).delete()
+            Arcitle.query.filter_by(id=wid).update({'n_thumb':Arcitle.n_thumb - 1})
+            db.session.commit()
+    except Exception:
+        #提交点赞
+        thumb = Thumb(uid=uid,wid=wid)
+        db.session.add(thumb)
+        Arcitle.query.filter_by(id=wid).update({'n_thumb': Arcitle.n_thumb + 1})
+        db.session.commit()
+
+    return redirect(f'/article/show?art_id={wid}')

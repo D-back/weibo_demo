@@ -8,15 +8,24 @@
 {% for art in articles %}
 <div class="alert alert-info" role="alert">
     <strong>{{ art.author.username }}:</strong>
+    <a style="float: right" class="text-secondary" href="">关注</a>
+
     <hr>
     &nbsp;&nbsp;&nbsp;&nbsp;{{ art.content | replace('\n','<br>') | safe }}
     <hr>
     <label style="float: right" class="text-secondary">{{ art.updated }}</label>
+
+    <!--  判断是否登录  -->
     {% if session.uid %}
-    <a class="text-secondary" href="/article/show?art_id={{ art.id }}">评论</a>
+    <a class="text-secondary" href="/article/show?art_id={{ art.id }}">评论&nbsp;&nbsp;&nbsp;&nbsp;</a>
     {% else %}
-    <a class="text-secondary" href="/user/login">评论</a>
+    <a class="text-secondary" href="/user/login">评论&nbsp;&nbsp;&nbsp;&nbsp;</a>
     {% endif  %}
+
+    <!-- 点赞数量   -->
+    <span class="text-secondary" >{{ art.n_thumb }}  赞</span>
+
+
 
 </div>
 

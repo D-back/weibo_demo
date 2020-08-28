@@ -14,6 +14,8 @@ class Arcitle(db.Model):
     content = db.Column(db.Text, nullable=False)
     create_time = db.Column(db.DateTime,nullable=False)
     updated = db.Column(db.DateTime,nullable=False)
+    n_thumb = db.Column(db.Integer,nullable=False,default=0)
+
 
     #获取用户的UID
     @property
@@ -54,7 +56,6 @@ class Comment(db.Model):
     create_time = db.Column(db.DateTime,nullable=False)
     is_delete = db.Column(db.Integer,default=0)
 
-
     # 获取当前评论的作者
     @property
     def author(self):
@@ -67,3 +68,11 @@ class Comment(db.Model):
             return None
         else:
             return Comment.query.get(self.cid)
+
+
+class Thumb(db.Model):
+    __tablename__ = 'thumb'
+    '''创建点赞表'''
+    uid = db.Column(db.Integer,nullable=False,primary_key=True)
+    wid = db.Column(db.Integer,nullable=False,primary_key=True)
+

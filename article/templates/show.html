@@ -10,13 +10,24 @@
 </div>
 {% endif %}
 
-<div class="alert alert-primary" role="alert">
+<div style="margin-top: 20px" class="alert alert-primary" role="alert">
     <form action="/article/modify" method="post" enctype="multipart/form-data">
-        <div style="margin-top: 50px" class="form-group row">
+        <div  class="form-group row">
             <input type="text" name="art_id" value="{{ article.id }}" hidden>
             <label class="col-sm-2 col-form-label">{{ article.author.username }}:</label>
+            <!--  判断是否再次点赞  -->
+                    <a class="text-secondary" href="/article/thumb?&wid={{ article.id }}">
+                        {% if is_thumb %}
+                        取消点赞
+                         {% else %}
+                        点赞
+                        {% endif %}
+                    </a>
+
+
             <div class="col-sm-8">
               <textarea class="form-control" name="content" rows="5">{{ article.content }}</textarea>
+        <!--   判断是否是自己的动态               -->
         {% if article.author.id == session.uid %}
             <div  class="form-group row">
                 <div class="col-sm-12">
@@ -60,13 +71,19 @@
     {{ cmt.content }}
     <label style="float: right" >{{ cmt.created }}</label>
     <a style="color: red" href="/article/delete_cmt?cid={{ cmt.id }}">&nbsp;&nbsp;&nbsp;&nbsp;删除</a>
+    <hr>
 
-    <form action="/article/comment_art" method="post">
-        <input  type="text" name="content" />
-        <input type="hidden" name="art_id" value="{{ article.id }}" />
-        <input type="hidden" name="cid" value="{{ cmt.id }}" />
-        <button  type="submit" class="btn btn-success">回复</button>
-    </form>
+    <div class="form-group row">
+        <form action="/article/comment_art" method="post">
+            <div class="col-sm-12">
+                <input  type="text"  class="form-control" name="content" />
+                <button  style="float: right"  type="submit"  class="btn btn-success">回复</button>
+            </div>
+            <input type="hidden" name="art_id" value="{{ article.id }}" />
+            <input type="hidden" name="cid" value="{{ cmt.id }}" />
+        </form>
+    </div>
+
 </div>
 {% endfor %}
 {% endblock  %}
