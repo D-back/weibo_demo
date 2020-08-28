@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+<!--信息页面-->
+{% block content %}
+<h2 class="text-primary">您的粉丝</h2>
+<hr>
+<div>
+    <ul class="list-group">
+        {% for fs in fans %}
+        <li class="list-group-item">
+            <img src="{{ fs.avatar }}" width="20px">&emsp;
+            <span><a class="text-primary" href="/user/other_info?uid={{ fs.id }}">{{ fs.username }}</a></span>&emsp;
+            <span>{{ fs.gender }}</span>&emsp;
+            <span>{{ fs.city }}</span>&emsp;
+            {% endfor %}
+        </li>
+    </ul>
+</div>
+
+{% endblock  %}

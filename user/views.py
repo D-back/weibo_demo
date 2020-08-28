@@ -13,7 +13,6 @@ from libs.utils import check_password
 from libs.utils import save_avatar
 from user.models import User
 from user.models import Follow
-from article.models import Arcitle
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 user_bp.template_folder = './templates'
@@ -23,28 +22,27 @@ user_bp.template_folder = './templates'
 @user_bp.route('/register', methods=('POST', 'GET'))
 def register():
     if request.method == 'POST':
-        username = request.form.get('username','').strip()
-        password1 = request.form.get('password1','').strip()
-        password2 = request.form.get('password2','').strip()
-        gender = request.form.get('gender','').strip()
-        city = request.form.get('city','').strip()
-        phone = request.form.get('phone','').strip()
+        username = request.form.get('username', '').strip()
+        password1 = request.form.get('password1', '').strip()
+        password2 = request.form.get('password2', '').strip()
+        gender = request.form.get('gender', '').strip()
+        city = request.form.get('city', '').strip()
+        phone = request.form.get('phone', '').strip()
         now = datetime.datetime.now()
         try:
             User.query.filter_by(username=username).one()
-            return render_template('register.html',err='用户名已存在')
+            return render_template('register.html', err='用户名已存在')
         except Exception:
             if not password1 or password1 != password2:
-                return render_template('register.html',err='密码不一致')
+                return render_template('register.html', err='密码不一致')
 
             user = User(username=username, password=make_password(password1),
                         gender=gender, city=city, phone=phone, create_time=now)
 
-            #保存头像
+            # 保存头像
             avatar_file = request.files.get('avatar', '')
             if avatar_file:
-                user.avatar=save_avatar(avatar_file)
-
+                user.avatar = save_avatar(avatar_file)
 
             db.session.add(user)
             db.session.commit()
@@ -64,12 +62,12 @@ def login():
             password = request.form.get('password')
             try:
                 user = User.query.filter_by(username=username).one()
-                if check_password(password,user.password):
+                if check_password(password, user.password):
                     session['uid'] = user.id
                     session['username'] = username
                     return redirect('/user/info')
                 else:
-                    return render_template('login.html',err='密码错误')
+                    return render_template('login.html', err='密码错误')
 
             except Exception:
                 return render_template('register.html', err='请先注册')
@@ -79,6 +77,7 @@ def login():
     else:
         return redirect('/user/info')
 
+
 # 用户个人信息接口
 @user_bp.route('/info')
 @login_required
@@ -87,24 +86,25 @@ def info():
     user = User.query.filter_by(id=uid).one()
     return render_template('info.html', user=user)
 
-#查看其他人个人信息接口
+
+# 查看其他人个人信息接口
 @user_bp.route('/other_info')
 @login_required
 def other_info():
     uid = int(request.args.get('uid'))
     user = User.query.filter_by(id=uid).one()
 
-    #判断是否是查看自己的个人信息
+    # 判断是否是查看自己的个人信息
     if uid == session.get('uid'):
         return render_template('info.html', user=user)
 
-    #判断是否关注这个用户
-    if Follow.query.filter_by(uid=session['uid'],fid=uid).count():
+    # 判断是否关注这个用户
+    if Follow.query.filter_by(uid=session['uid'], fid=uid).count():
         is_follow = True
     else:
         is_follow = False
 
-    return render_template('other_info.html', user=user,is_follow=is_follow)
+    return render_template('other_info.html', user=user, is_follow=is_follow)
 
 
 # 退出接口
@@ -115,25 +115,25 @@ def logout():
     return redirect('/user/login')
 
 
-#关注接口
+# 关注接口
 @user_bp.route('/follow')
 @login_required
 def follow_other_user():
-    uid = session.get('uid')   #自己的ID
-    fid = int(request.args.get('fid'))  #关注的人的id
+    uid = session.get('uid')  # 自己的ID
+    fid = int(request.args.get('fid'))  # 关注的人的id
     print(uid)
     print(fid)
 
     try:
-        #取消关注
-        follow = Follow.query.filter_by(uid=uid,fid=fid).one()
+        # 取消关注
+        follow = Follow.query.filter_by(uid=uid, fid=fid).one()
         if follow:
             Follow.query.filter_by(uid=uid, fid=fid).delete()
-            User.query.filter_by(id=uid).update({'follows':User.follows - 1 })
-            User.query.filter_by(id=fid).update({'fans':User.fans - 1 })
+            User.query.filter_by(id=uid).update({'follows': User.follows - 1})
+            User.query.filter_by(id=fid).update({'fans': User.fans - 1})
             db.session.commit()
     except Exception:
-        #关注
+        # 关注
         fw = Follow(uid=uid, fid=fid)
         User.query.filter_by(id=uid).update({'follows': User.follows + 1})
         User.query.filter_by(id=fid).update({'fans': User.fans + 1})
@@ -143,3 +143,12 @@ def follow_other_user():
     return redirect(f'/user/other_info?uid={fid}')
 
 
+# 查看自己所有的粉丝
+@user_bp.route('/fans')
+@login_required
+def fans():
+    uid = session.get('uid')
+    fs = Follow.query.filter_by(fid=uid).values('uid')
+    fans_list = [uid for (uid,) in fs ]
+    fans = User.query.filter(User.id.in_(fans_list))
+    return render_template('fans.html',fans=fans)

@@ -28,12 +28,12 @@
           <li class="nav-item  {% if request.path == '/article/modify' %} active {% endif %}">
             <a class="nav-link" href="/article/modify">修改动态</a>
           </li>
-          <li class="nav-item  {% if request.path == '/' %} active {% endif %}">
+          <li class="nav-item  {% if request.path == '/article/fw_article' %} active {% endif %}">
             <a class="nav-link" href="/article/fw_article">关注的人</a>
           </li>
 
-          <li class="nav-item  {% if request.path == '/' %} active {% endif %}">
-            <a class="nav-link" href="#" >粉丝列表</a>
+          <li class="nav-item  {% if request.path == '/user/fans' %} active {% endif %}">
+            <a class="nav-link" href="/user/fans" >粉丝列表</a>
           </li>
         </ul>
         <div>
