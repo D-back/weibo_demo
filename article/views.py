@@ -202,3 +202,6 @@ def fw_art():
     return render_template('fw_article.html',articles=articles)
 
 
+# # 热门微博
+# @article_bp.route('/hot_art')
+# def hot_art():

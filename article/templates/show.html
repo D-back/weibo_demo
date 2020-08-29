@@ -12,43 +12,49 @@
 
 <div style="margin-top: 20px" class="alert alert-primary" role="alert">
     <form action="/article/modify" method="post" enctype="multipart/form-data">
-        <div  class="form-group row">
+        <div  >
             <input type="text" name="art_id" value="{{ article.id }}" hidden>
-            <label class="col-sm-2 col-form-label">{{ article.author.username }}:</label>
-            <div class="col-sm-8">
-              <textarea class="form-control" name="content" rows="5">{{ article.content }}</textarea>
-                  <!--  判断是否再次点赞  -->
-                    <a style="float: right" class="text-secondary" href="/article/thumb?&wid={{ article.id }}">
-                        {{ article.n_thumb }}{% if is_thumb %}取消点赞{% else %}点赞{% endif %}
-                    </a>
+            <span class="text-primary" >{{ article.author.username }}:</span>
+            <!--  判断是否再次点赞  -->
+            <a style="float: right" class="text-primary" href="/article/thumb?&wid={{ article.id }}">
+                    {{ article.n_thumb }}&emsp;{% if is_thumb %}取消点赞{% else %}点赞{% endif %}
+            </a>
+        </div>
+
+        <div  class="col-sm-14">
+
+          <textarea  class="form-control" name="content" rows="5">{{ article.content }}</textarea>
+        </div>
+
         <!--   判断是否是自己的动态               -->
         {% if article.author.id == session.uid %}
             <div  class="form-group row">
                 <div class="col-sm-12">
                     <hr>
-                    <a style="float: right;margin-left: 10px" class="btn btn-danger" href="/article/delete?art_id={{ article.id }}">删除动态</a>
+                    <a style="float: right;margin-left: 10px" class="btn btn-danger"
+                       href="/article/delete?art_id={{ article.id }}">删除动态
+                    </a>
                     <button style="float: right;" type="submit" class="btn btn-danger">修改</button>
                 </div>
             </div>
         {% endif %}
-            </div>
-        </div>
     </form>
 </div>
 
 
 
 <!-- 评论页面 -->
+
 <div class="alert alert-secondary" role="alert">
-    <form action="/article/comment_art" method="post" >
-        <div class="form-group row">
+    <form class="form-inline" action="/article/comment_art" method="post" >
+        <div class="form-group mx-sm-3 mb-2">
             <input type="hidden" name="art_id" value="{{ article.id }}" >
-            <textarea class="form-control" name="content" rows="2" placeholder="请发表您的评论:"></textarea>
-            <div  class="col-sm-12">
-                <hr>
-                <button style="float: right" type="submit" class="btn btn-success">评论</button>
-            </div>
+            <input style="margin-top: 2px" type="text"   class="form-control" name="content"  placeholder="请发表您的评论:">
         </div>
+        <button style="float: right" type="submit" class="btn btn-success">评论</button>
+
+
+
     </form>
 </div>
 
@@ -63,15 +69,16 @@
     {% endif %}
     <hr>
     {{ cmt.content }}
-    <label style="float: right" >{{ cmt.created }}</label>
-    <a style="color: red" href="/article/delete_cmt?cid={{ cmt.id }}">&nbsp;&nbsp;&nbsp;&nbsp;删除</a>
+    <label style="float: right" >{{ cmt.create_time }}</label>
+    <a style="color: red;float: right" href="/article/delete_cmt?cid={{ cmt.id }}">删除&emsp;</a>
     <hr>
 
-    <form action="/article/comment_art" method="post">
-        <div >
-            <input  type="text"  class="form-check-label" name="content" />
-            <button  style="float: right"  type="submit"  class="btn btn-success">回复</button>
+    <form class="form-inline" action="/article/comment_art" method="post">
+        <div class="form-group mx-sm-3 mb-2" >
+            <input  style="margin-top: 2px" type="text" class="form-control"  name="content" />
         </div>
+        <button  style="float: right"  type="submit"  class="btn btn-success">回复</button>
+
         <input type="hidden" name="art_id" value="{{ article.id }}" />
         <input type="hidden" name="cid" value="{{ cmt.id }}" />
     </form>
