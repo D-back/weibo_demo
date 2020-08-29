@@ -104,6 +104,11 @@ def other_info():
     else:
         is_follow = False
 
+    #判断是否从首页关注
+    is_show_all = request.args.get('is_show_all')
+    if is_show_all:
+        return redirect(f'/article/show_all?is_follow={is_follow}&fid={uid}')
+
     return render_template('other_info.html', user=user, is_follow=is_follow)
 
 
@@ -121,8 +126,7 @@ def logout():
 def follow_other_user():
     uid = session.get('uid')  # 自己的ID
     fid = int(request.args.get('fid'))  # 关注的人的id
-    print(uid)
-    print(fid)
+
 
     try:
         # 取消关注
@@ -140,7 +144,12 @@ def follow_other_user():
         db.session.add(fw)
         db.session.commit()
 
-    return redirect(f'/user/other_info?uid={fid}')
+    #判断是否从首页关注
+    is_show_all = request.args.get('is_show_all')
+    if is_show_all:  #从首页进行关注
+        return redirect(f'/user/other_info?uid={fid}&is_show_all={is_show_all}')
+    else:
+        return redirect(f'/user/other_info?uid={fid}')
 
 
 # 查看自己所有的粉丝

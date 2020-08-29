@@ -3,6 +3,7 @@ import random
 from libs.orm import db
 from user.models import User
 from libs.utils import random_zh_str
+from user.models import Follow
 
 
 class Arcitle(db.Model):
@@ -20,6 +21,20 @@ class Arcitle(db.Model):
     @property
     def author(self):
         return User.query.get(self.uid)
+
+    # 获取给自己文章点赞的所有
+    @property
+    def check_thumb(self):
+        users_id = Thumb.query.filter_by(wid=self.id).values('uid')
+        users_ids = [uid for (uid,) in users_id]
+        return users_ids
+
+    # 获取自己所有关注的人的id
+    @property
+    def check_follow(self):
+        uid = Follow.query.filter_by(fid=self.uid).values('uid')
+        uids = [uid for (uid,) in uid]
+        return uids
 
     # 创建随机动态
     @classmethod
@@ -71,3 +86,5 @@ class Thumb(db.Model):
     '''创建点赞表'''
     uid = db.Column(db.Integer, nullable=False, primary_key=True)
     wid = db.Column(db.Integer, nullable=False, primary_key=True)
+
+

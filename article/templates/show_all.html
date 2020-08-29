@@ -7,7 +7,17 @@
 <hr>
 {% for art in articles %}
 <div class="alert alert-info" role="alert">
+    <img class="rounded-circle" src="{{ art.author.avatar }}" height="40px" width="40px">
     <strong><a href="/user/other_info?uid={{ art.author.id }}">{{ art.author.username }}</a>:</strong>
+
+     <!--  判断是否关注此人  -->
+    <a style="float: right" class="text-primary" href="/user/follow?fid={{ art.author.id }}&is_show_all=1">
+        {% if session.uid in art.check_follow %}
+        取消关注
+        {% else %}
+        关注
+        {% endif %}
+    </a>
     <hr>
     &nbsp;&nbsp;&nbsp;&nbsp;{{ art.content | replace('\n','<br>') | safe }}
     <hr>
@@ -20,8 +30,18 @@
     <a class="text-secondary" href="/user/login">评论&nbsp;&nbsp;&nbsp;&nbsp;</a>
     {% endif  %}
 
-    <!-- 点赞数量   -->
-    <span class="text-secondary" >{{ art.n_thumb }}  赞</span>
+     <!--  判断是否再次点赞  -->
+    <a  class="text-primary" href="/article/thumb?wid={{ art.id }}&is_show_all=1">
+
+        {% if session.uid in art.check_thumb %}
+        取消点赞
+        {% else %}
+        点赞
+        {% endif %}
+        {{ art.n_thumb }}&emsp;
+    </a>
+
+
 
 </div>
 {% endfor %}
@@ -64,7 +84,8 @@
 </div>
 <hr>
 {% for hot_art in hot_articles %}
-<div class="alert alert-light" role="alert">
+<div class="alert alert-heading" role="alert">
+    <img class="rounded-circle" src="{{ hot_art.author.avatar }}" height="40px" width="40px">
     <strong><a href="/user/other_info?uid={{ hot_art.author.id }}">{{ hot_art.author.username }}</a>:</strong>
 
     &nbsp;&nbsp;&nbsp;&nbsp;{{ hot_art.content | replace('\n','<br>') | safe }}

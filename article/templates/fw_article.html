@@ -6,6 +6,7 @@
 <hr>
 {% for art in articles %}
 <div class="alert alert-info" role="alert">
+    <img class="rounded-circle" src="{{ art.author.avatar }}" height="40px" width="40px">
     <strong><a href="/user/other_info?uid={{ art.author.id }}">{{ art.author.username }}</a>:</strong>
     <hr>
     &nbsp;&nbsp;&nbsp;&nbsp;{{ art.content | replace('\n','<br>') | safe }}

@@ -17,6 +17,7 @@
         <div >
             <div class="form-group row">
                 <input type="text" name="art_id" value="{{ art.id }}" hidden>
+                <img class="rounded-circle" src="{{ art.author.avatar }}" height="40px" width="40px">
                 <label class="col-sm-2 col-form-label">{{ art.author.username }}:</label>
                 <div class="col-sm-8">
                   <textarea class="form-control" name="content" rows="5">{{ art.content }}</textarea>

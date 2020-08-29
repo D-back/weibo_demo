@@ -58,6 +58,11 @@ def show():
     else:
         is_thumb = False
 
+    # 判读点赞是否来自首页
+    is_show_all = request.args.get('is_show_all')
+    if is_show_all:
+        return redirect(f'/article/show_all?is_thumb={is_thumb}&art_id={art_id}')
+
     # 判断评论内容是否为空
     err = request.args.get('err')
     if err:
@@ -97,6 +102,20 @@ def modify():
 # 显示所有动态
 @article_bp.route('/show_all')
 def show_all():
+    #接收点赞参数
+    is_thumb = request.args.get('is_thumb')
+    #点赞来自首页
+    art_id = request.args.get('art_id')
+    if art_id:   #判断是否有值
+        art_id = int(art_id)
+
+    #接收关注参数
+    is_follow = request.args.get('is_follow')
+    fid = request.args.get('fid')
+    #关注来自首页
+    if fid and is_follow:
+        fid = int(fid)
+
 
     #内容部分
     page = int(request.args.get('page', 1))
@@ -115,8 +134,10 @@ def show_all():
     #边栏部分
     now = datetime.datetime.now() - datetime.timedelta(days=30)
     hot_articles = Arcitle.query.filter(Arcitle.updated > now).order_by(Arcitle.n_thumb.desc()).limit(25)
+    # session['hot_articles']= hot_articles
     return render_template('show_all.html', articles=articles, page=page,
-                           page_num=page_num, max_page=per_page,hot_articles=hot_articles)
+                           page_num=page_num, max_page=per_page,hot_articles=hot_articles,
+                           is_thumb=is_thumb,art_id=art_id,is_follow=is_follow,fid=fid)
 
 
 # 删除动态接口
@@ -178,7 +199,7 @@ def delete_cmt():
 def thumb():
     uid = session.get('uid')
     wid = int(request.args.get('wid'))
-
+    is_show_all = request.args.get('is_show_all')
     # 判断是否是再次点赞
     try:
         thumb = Thumb.query.filter_by(uid=uid, wid=wid).one()
@@ -194,7 +215,11 @@ def thumb():
         Arcitle.query.filter_by(id=wid).update({'n_thumb': Arcitle.n_thumb + 1})
         db.session.commit()
 
-    return redirect(f'/article/show?art_id={wid}')
+    #判断是否是从首页点赞
+    if is_show_all:
+        return redirect(f'/article/show?art_id={wid}&is_show_all=1')
+    else:
+        return redirect(f'/article/show?art_id={wid}')
 
 
 #查看所有关注的人的微博

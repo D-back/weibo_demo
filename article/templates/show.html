@@ -14,10 +14,11 @@
     <form action="/article/modify" method="post" enctype="multipart/form-data">
         <div  >
             <input type="text" name="art_id" value="{{ article.id }}" hidden>
+            <img class="rounded-circle" src="{{ article.author.avatar }}" height="40px" width="40px">
             <span class="text-primary" >{{ article.author.username }}:</span>
             <!--  判断是否再次点赞  -->
-            <a style="float: right" class="text-primary" href="/article/thumb?&wid={{ article.id }}">
-                    {{ article.n_thumb }}&emsp;{% if is_thumb %}取消点赞{% else %}点赞{% endif %}
+            <a style="float: right" class="text-primary" href="/article/thumb?wid={{ article.id }}">
+                    {% if is_thumb %}取消点赞{% else %}点赞{% endif %}&emsp;{{ article.n_thumb }}
             </a>
         </div>
 

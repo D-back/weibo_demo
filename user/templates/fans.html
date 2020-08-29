@@ -8,7 +8,7 @@
     <ul class="list-group">
         {% for fs in fans %}
         <li class="list-group-item">
-            <img src="{{ fs.avatar }}" width="20px">&emsp;
+            <img class="rounded-circle" src="{{ fs.avatar }}" height="40px" width="40px">
             <span><a class="text-primary" href="/user/other_info?uid={{ fs.id }}">{{ fs.username }}</a></span>&emsp;
             <span>{{ fs.gender }}</span>&emsp;
             <span>{{ fs.city }}</span>&emsp;
