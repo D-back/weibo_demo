@@ -97,6 +97,8 @@ def modify():
 # 显示所有动态
 @article_bp.route('/show_all')
 def show_all():
+
+    #内容部分
     page = int(request.args.get('page', 1))
     count_articles = Arcitle.query.count()
     per_page = ceil(count_articles / 30)
@@ -109,8 +111,12 @@ def show_all():
         start, end = page - 3, page + 3
     page_num = range(start, end + 1)
     articles = Arcitle.query.order_by(Arcitle.create_time.desc()).limit(30).offset(30 * (page - 1))
+
+    #边栏部分
+    now = datetime.datetime.now() - datetime.timedelta(days=30)
+    hot_articles = Arcitle.query.filter(Arcitle.updated > now).order_by(Arcitle.n_thumb.desc()).limit(25)
     return render_template('show_all.html', articles=articles, page=page,
-                           page_num=page_num, max_page=per_page)
+                           page_num=page_num, max_page=per_page,hot_articles=hot_articles)
 
 
 # 删除动态接口
@@ -201,7 +207,3 @@ def fw_art():
     articles = Arcitle.query.filter(Arcitle.uid.in_(fid_list)).order_by(Arcitle.updated.desc()).limit(100)
     return render_template('fw_article.html',articles=articles)
 
-
-# # 热门微博
-# @article_bp.route('/hot_art')
-# def hot_art():
