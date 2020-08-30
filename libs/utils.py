@@ -43,7 +43,7 @@ def save_avatar(avatar_file):
     filename = md5(file_bin_data).hexdigest()
 
     #获取项目文件夹的绝对路径
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir = os.path.dirname(os.path.dirname((os.path.abspath(__file__))))
 
     #文件绝对路径
     filepath = os.path.join(base_dir, 'static', 'upload', filename)

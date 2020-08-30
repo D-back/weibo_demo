@@ -11,6 +11,7 @@
     <strong><a href="/user/other_info?uid={{ art.author.id }}">{{ art.author.username }}</a>:</strong>
 
      <!--  判断是否关注此人  -->
+    {% if session.uid != art.author.id %}
     <a style="float: right" class="text-primary" href="/user/follow?fid={{ art.author.id }}&is_show_all=1">
         {% if session.uid in art.check_follow %}
         取消关注
@@ -18,6 +19,9 @@
         关注
         {% endif %}
     </a>
+    {% endif %}
+
+
     <hr>
     &nbsp;&nbsp;&nbsp;&nbsp;{{ art.content | replace('\n','<br>') | safe }}
     <hr>
